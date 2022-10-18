@@ -1,0 +1,21 @@
+// 수량 증가(+)버튼 클릭 시 1개 증가
+	    $(".plus").on("click",function(){
+	        let productCount = $(this).prev();
+	        <%-- 20개 이상 구매 시 차단(?) --%>
+	        if(productCount.val()>=20){	        	
+	        	alert("그만 사셈..");
+	        }else{
+	        	let productPrice = $(".product-price");
+	        	$(".count").val(Number(productCount.val())+1);
+	        	$(".count").text(Number(productCount.val()));	        
+	        	<%-- 계산을 위해 콤마 제거--%>
+	        	removeComma($(".product-price-sum").text());
+	        	<%-- 콤마 제거한 뒤 수량 곱하기 가격 실행 후 변수에 값 대입 --%>
+	        	let productPriceSum = Number(removeComma($(".product-price").text()))*Number(productCount.val());
+	        	console.log(productPriceSum);
+	        	<%-- 가격 계산 후 다시 콤마 추가 후 값 추가 --%>
+	        	addComma(productPriceSum);
+	        	console.log(addComma(productPriceSum));
+	        	$(".product-price-sum").text(addComma(productPriceSum));
+	        }
+	    });

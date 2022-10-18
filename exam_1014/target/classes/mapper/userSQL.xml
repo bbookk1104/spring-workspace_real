@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="user">
+	<select id="loginUser" parameterType="u" resultType="u">
+		select * from user_tbl where user_id=#{userId} and user_pw=#{userPw}
+	</select>
+	<select id="userList" resultType="u">>
+		select * from user_tbl
+	</select>
+	<insert id="insertUser" parameterType="u">
+		insert into user_tbl values(
+			user_seq.nextval, #{userId}, #{userPw}
+		);
+	</insert>
+</mapper>

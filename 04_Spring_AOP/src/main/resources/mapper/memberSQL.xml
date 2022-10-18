@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+	<select id="selectOneMember" parameterType="m" resultType="m">
+	<!-- parameterType="kr.or.member.model.vo.Member" => config.xml에서 typeAlias를 통해 m으로 대체 -->
+	<!-- vo의 변수명과 다른 컬럼명은 vo변수명과 똑같은 별칭으로 설정 -->
+		select
+			member_no as memberNo,
+			member_id as memberId,
+			member_pw as memberPw,
+			member_name as memberName,
+			phone,
+			email
+		from member_tbl
+		where member_id=#{memberId}
+		<if test="memberPw != null">
+		<!-- 비밀번호가 null이면 아이디로만 조회, 값이 있으면 아이디&비밀번호로 조회 -->
+		and member_pw=#{memberPw}
+		</if>
+		<if test="email != null">
+		and email = #{email}
+		</if>
+	</select>
+	
+	<!-- Dao에서 list로 리턴할거라는 정보가 이미 있음. resultType에서는 list안에 들어갈 객체 타입을 적는 것 -->
+	<select id="selectAllMember" resultType="m">
+		select
+			member_no as memberNo,
+			member_id as memberId,
+			member_pw as memberPw,
+			member_name as memberName,
+			phone,
+			email
+		from member_tbl order by member_no
+	</select>
+	
+	<insert id="insertMember" parameterType="m">
+		insert into member_tbl values(member_seq.nextval,#{memberId},#{memberPw},#{memberName},#{phone},#{email})
+	</insert>
+	
+	<update id="updateMember" parameterType="m">
+		update member_tbl set 
+			phone=#{phone},
+			email=#{email} 
+		where member_id=#{memberId}
+	</update>
+	
+	<delete id="deleteMember" parameterType="_int">
+	<!-- 단일 값 하나면 #{_parameter} -->
+		delete from member_tbl where member_no=#{_parameter}
+	</delete>
+	
+	<select id="selectAllMemberName" parameterType="string" resultType="m">
+	<!-- 타입 적을 때 Mybatis내장 별칭 사용(String-> string) -->
+		select
+			member_no as memberNo,
+			member_id as memberId,
+			member_pw as memberPw,
+			member_name as memberName,
+			phone,
+			email
+		from member_tbl where member_name like '%'||#{_parameter}||'%'
+	</select>
+	
+	<select id="searchMember1" parameterType="map" resultType="m">
+		select
+			member_no as memberNo,
+			member_id as memberId,
+			member_pw as memberPw,
+			member_name as memberName,
+			phone,
+			email
+		from member_tbl
+		<choose>
+			<when test="type.equals('id')">
+				where member_id = #{keyword}
+			</when>
+			<when test="type.equals('name')">
+				where member_name like '%'||#{keyword}||'%'
+			</when>
+		</choose>
+	</select>
+	
+	<select id="searchMember2" parameterType="m" resultType="m">
+		select
+			member_no as memberNo,
+			member_id as memberId,
+			member_pw as memberPw,
+			member_name as memberName,
+			phone,
+			email
+		from member_tbl
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="!memberId.equals('')">
+				member_id like '%'||#{memberId}||'%'
+			</if>
+			<if test="!memberName.equals('')">
+				and member_name like '%'||#{memberName}||'%'
+			</if>
+		</trim>
+		<!-- <choose>
+			<when test="!memberId.equals('') and memberName.equals('')">
+				where member_id like '%'||#{memberId}||'%'
+			</when>
+			<when test="memberId.equals('') and !memberName.equals('')">
+				where member_name like '%'||#{memberName}||'%'
+			</when>
+			<when test="!memberId.equals('') and !memberName.equals('')">
+				where member_id like '%'||#{memberId}||'%'
+				and member_name like '%'||#{memberName}||'%'
+			</when>
+		</choose> -->
+	</select>
+	
+	<select id="selectIdList" resultType="string">
+		select member_id as memberId from member_tbl
+	</select>
+	
+	<select id="searchMember3" parameterType="map" resultType="m">
+		select
+			member_no as memberNo,
+			member_id as memberId,
+			member_pw as memberPw,
+			member_name as memberName,
+			phone,
+			email
+		from member_tbl
+		where member_id in
+		<foreach collection="array" item="memberId" open="(" close=")" separator=",">
+		#{memberId}
+		</foreach>
+	</select>
+	
+	<select id="searchMember4" resultType="m">
+		select
+			member_no as memberNo,
+			member_id as memberId,
+			member_pw as memberPw,
+			member_name as memberName,
+			phone,
+			email
+		from member_tbl
+		where member_no <![CDATA[<]]> 10
+	</select>
+	
+	<update id="updatePw" parameterType="m">
+		update member_tbl set member_pw=#{memberPw}
+		where member_no=#{memberNo}
+	</update>
+	
+	<!-- 
+	<select id="searchPw" parameterType="m" resultType="m">
+		select member_id as memberId, email
+		from member_tbl
+		where member_id=#{memberId} and email=#{email}
+	</select>
+	 -->
+</mapper>
